@@ -198,7 +198,24 @@ module.exports = {
       });
     }
 
-
+    // add themes from external json data source
+    // such as: /api/themes/[tenant_code].svelte
+    //          /custom/themes/custom.json
+    //          /restapi/themes/[tenant_code]
+    if (Array.isArray(config("daisyui.themes_external_src"))) {
+      console.log("injectThemes() daisyui.themes_external_src: ", config("daisyui.themes_external_src"));
+      config("daisyui.themes_external_src").forEach((src_uri, index) => {
+        if (src_uri !== null) {
+          const item = fetch(src_uri);
+          if (typeof item === "object" && item !== null) {
+            Object.entries(item).forEach(([customThemeName, customThemevalue]) => {
+            includedThemesObj["[data-theme=" + customThemeName + "]"] =
+              this.convertToHsl(customThemevalue);
+            });
+          }
+        }
+      });
+    }
 
     let themeOrder = [];
     if (Array.isArray(config("daisyui.themes"))) {
